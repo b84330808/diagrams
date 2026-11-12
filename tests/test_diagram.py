@@ -134,6 +134,20 @@ class DiagramTest(unittest.TestCase):
         # clean the dot file as it only generated here
         os.remove(self.name + ".dot")
 
+    def test_custom_relative_icon_with_output_directory(self):
+        """Check that a relative Custom icon path still loads when the output file is in another directory."""
+        from diagrams.custom import Custom
+
+        os.makedirs(self.name)
+        icon = os.path.join(self.name, "icon.png")
+        shutil.copy(pathlib.Path(__file__).parent.parent / "resources" / "aws" / "compute" / "ec2.png", icon)
+        filename = os.path.join(self.name, "output", "custom_icon")
+        with Diagram(filename=filename, show=False, outformat="svg"):
+            Custom("custom", icon)
+
+        with open(filename + ".svg", encoding="utf-8") as f:
+            self.assertIn("<image", f.read())
+
 
 class NodeHeightTest(unittest.TestCase):
     def setUp(self):
